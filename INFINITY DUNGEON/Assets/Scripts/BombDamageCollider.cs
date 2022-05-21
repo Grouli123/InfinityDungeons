@@ -6,7 +6,6 @@ namespace SG
 {
     public class BombDamageCollider : DamageCollider
     {
-        public GameObject test;
         [Header("Explosive Damage & Radius")]
         public int eplosiveRadius = 1;
         public int explosiveDamage;
