@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61e1a1254bd78934f8b452f8d95930e3, type: 3}
+  m_Name: Bard Hand
+  m_EditorClassIdentifier: 
+  itemIcon: {fileID: 21300000, guid: f5f1d614170575299655e4b44990d616, type: 3}
+  itemName: Bard Hand
+  physicalDefense: 7
+  leftHandModelName: Bard_HandLeft
+  rightHandModelName: Bard_HandRight
+  lowerLeftArmModelName: Bard_ArmLowerLeft
+  lowerRightArmModelName: Bard_ArmLowerRight
