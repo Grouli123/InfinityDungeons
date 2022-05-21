@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SG
+namespace DangeonInf
 {
     public class DatabaseAccess : MonoBehaviour
     {

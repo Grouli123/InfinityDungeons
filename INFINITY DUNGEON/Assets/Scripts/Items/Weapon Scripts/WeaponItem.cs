@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SG
+namespace DangeonInf
 {
     [CreateAssetMenu(menuName = "Items/Weapon Item")]
     public class WeaponItem : Item

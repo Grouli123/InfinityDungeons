@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace  SG
+namespace  DangeonInf
 {
     [CreateAssetMenu(menuName = "OurDarkSouls/TempPlayerSkin")]
     public class TempPlayerSkin : ScriptableObject 

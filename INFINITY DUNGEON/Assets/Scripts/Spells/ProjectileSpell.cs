@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SG
+namespace DangeonInf
 {
     [CreateAssetMenu(menuName = "Spells/Projectile Spell")]
     public class ProjectileSpell : SpellItem

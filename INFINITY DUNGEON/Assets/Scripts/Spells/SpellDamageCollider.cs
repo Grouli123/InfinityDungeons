@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
- namespace SG 
+ namespace DangeonInf 
  {
     public class SpellDamageCollider : DamageCollider
     {

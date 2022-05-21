@@ -1,45 +1,43 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace SG
+namespace DangeonInf
 {
     public class AmbushState : State
     {
-		public bool isSleeping;
-		public float detectionRadius = 2;
-		public string sleepAnimation;
-		public string wakeAnimation;
-		public LayerMask detectionLayer;
+		public bool _isSleep;
+		public float _detectionRadius = 2;
+		public string animSleep;
+		public string _wakeUpAnimation;
+		public LayerMask _layerDetection;
 
-		public PursueTargetState pursueTargetState;
+		public PursueTargetState _pursueState;
 
-        public override State Tick(EnemyManager enemyManager, EnemyStatsManager enemyStatsManager, EnemyAnimatorManager enemyAnimatorManager)
+        public override State Tick(EnemyManager _enemyManager, EnemyStatsManager _enemyStatsManager, EnemyAnimatorManager _enemyAnimatorManager)
         {
-			if(isSleeping && enemyManager.isInteracting == false)
+			if(_isSleep && _enemyManager.isInteracting == false)
 			{
-				enemyAnimatorManager.PlayTargetAnimation(sleepAnimation, true);
+				_enemyAnimatorManager.PlayTargetAnimation(animSleep, true);
 			}
 
 			#region  Handle Target Detection:
 
-			Collider[] colliders = Physics.OverlapSphere(transform.transform.position, enemyManager.detectionRadius, detectionLayer);
+			Collider[] colliders = Physics.OverlapSphere(transform.transform.position, _enemyManager.detectionRadius, _layerDetection);
 
 			for (int i = 0; i < colliders.Length; i++)
 			{
-				CharacterStatsManager characterStats = colliders[i].transform.GetComponent<CharacterStatsManager>();
+				CharacterStatsManager _characterStats = colliders[i].transform.GetComponent<CharacterStatsManager>();
 
-				if(characterStats != null)
+				if(_characterStats != null)
 				{
-					Vector3 targetsDirection = characterStats.transform.position - enemyManager.transform.position;
-					float viewableAngle = Vector3.Angle(targetsDirection, enemyManager.transform.forward);
+					Vector3 _directionTarget = _characterStats.transform.position - _enemyManager.transform.position;
+					float _viewableAngle = Vector3.Angle(_directionTarget, _enemyManager.transform.forward);
 
-					if(viewableAngle > enemyManager.mininumDetectionAngle &&
-					viewableAngle < enemyManager.maximumDetectionAngle)
+					if(_viewableAngle > _enemyManager.mininumDetectionAngle &&
+					_viewableAngle < _enemyManager.maximumDetectionAngle)
 					{
-						enemyManager.currentTarget = characterStats;
-						isSleeping = false;
-						enemyAnimatorManager.PlayTargetAnimation(wakeAnimation, true);
+						_enemyManager.currentTarget = _characterStats;
+						_isSleep = false;
+						_enemyAnimatorManager.PlayTargetAnimation(_wakeUpAnimation, true);
 					}
 				}
 			}
@@ -48,9 +46,9 @@ namespace SG
 	
 			# region Handle State Change
 
-			if (enemyManager.currentTarget != null)
+			if (_enemyManager.currentTarget != null)
 			{
-				return pursueTargetState;
+				return _pursueState;
 			}
 			else
 			{

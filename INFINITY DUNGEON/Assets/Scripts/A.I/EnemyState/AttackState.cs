@@ -1,72 +1,70 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace SG
+namespace DangeonInf
 {
     public class AttackState : State
     {
-        public CombatStanceState combatStanceState;
-        public EnemyAttackAction[] enemyAttacks;
-        public EnemyAttackAction currentAttack;
+        public CombatStanceState _combatState;
+        public EnemyAttackAction[] _attackEnemy;
+        public EnemyAttackAction _attack;
 
-        bool willDoComboOnNextAttack = false;
+        bool _itIsWillDoComboOnNextAttack = false;
 
-        public override State Tick(EnemyManager enemyManager, EnemyStatsManager enemyStatsManager, EnemyAnimatorManager enemyAnimatorManager)
+        public override State Tick(EnemyManager _enemyManager, EnemyStatsManager _enemyStatsManager, EnemyAnimatorManager _enemyAnimatorManager)
         {
-            if (enemyManager.isInteracting && enemyManager.canDoCombo == false)
+            if (_enemyManager.isInteracting && _enemyManager.canDoCombo == false)
             {
                 return this;
             }
-            else if (enemyManager.isInteracting && enemyManager.canDoCombo)
+            else if (_enemyManager.isInteracting && _enemyManager.canDoCombo)
             {
-                if (willDoComboOnNextAttack)
+                if (_itIsWillDoComboOnNextAttack)
                 {
-                    willDoComboOnNextAttack = false;
-                    enemyAnimatorManager.PlayTargetAnimation(currentAttack.actionAnimation, true);
+                    _itIsWillDoComboOnNextAttack = false;
+                    _enemyAnimatorManager.PlayTargetAnimation(_attack.actionAnimation, true);
                 }
             }
 
-            Vector3 targetDirection = enemyManager.currentTarget.transform.position - transform.position;//Поставил EnemyManager
-            float distanceFromTarget = Vector3.Distance(enemyManager.currentTarget.transform.position, enemyManager.transform.position);
-            float viewableAngle = Vector3.Angle(targetDirection, transform.forward);
+            Vector3 _directionTarget = _enemyManager.currentTarget.transform.position - transform.position;//Поставил EnemyManager
+            float _distanceToTarget = Vector3.Distance(_enemyManager.currentTarget.transform.position, _enemyManager.transform.position);
+            float _viewableAngle = Vector3.Angle(_directionTarget, transform.forward);
 
-            HandleRotateTowardsTarget(enemyManager);
+            RotateTowardsTargetByHandle(_enemyManager);
 
-            if(enemyManager.isPreformingAction)
+            if(_enemyManager.isPreformingAction)
             {                
-                return combatStanceState;
+                return _combatState;
             }
             
-            if (currentAttack != null)
+            if (_attack != null)
             {
-                if(distanceFromTarget < currentAttack.mininumDistanceNeededToAttack)
+                if(_distanceToTarget < _attack.mininumDistanceNeededToAttack)
                 {
                     return this;
                 }
-                else if (distanceFromTarget < currentAttack.maximumDistanceNeededToAttack)
+                else if (_distanceToTarget < _attack.maximumDistanceNeededToAttack)
                 {
-                    if (viewableAngle <= currentAttack.maximumAttackAngle &&
-                    viewableAngle >= currentAttack.minimumAttackAngle)
+                    if (_viewableAngle <= _attack.maximumAttackAngle &&
+                    _viewableAngle >= _attack.minimumAttackAngle)
                     {
-                        if (enemyManager.currentRecoveryTime <= 0 && enemyManager.isPreformingAction == false)
+                        if (_enemyManager.currentRecoveryTime <= 0 && _enemyManager.isPreformingAction == false)
                         {
-                            enemyAnimatorManager.animator.SetFloat("Vertical", 0, 0.1f, Time.deltaTime);
-                            enemyAnimatorManager.animator.SetFloat("Horizontal", 0, 0.1f, Time.deltaTime);
-                            enemyAnimatorManager.PlayTargetAnimation(currentAttack.actionAnimation, true);
-                            enemyManager.isPreformingAction = true;
-                            RollForComboChance(enemyManager);
+                            _enemyAnimatorManager.animator.SetFloat("Vertical", 0, 0.1f, Time.deltaTime);
+                            _enemyAnimatorManager.animator.SetFloat("Horizontal", 0, 0.1f, Time.deltaTime);
+                            _enemyAnimatorManager.PlayTargetAnimation(_attack.actionAnimation, true);
+                            _enemyManager.isPreformingAction = true;
+                            ComboChanceByRoll(_enemyManager);
                             
-                            if(currentAttack.canCombo && willDoComboOnNextAttack)
+                            if(_attack.canCombo && _itIsWillDoComboOnNextAttack)
                             {
-                                currentAttack = currentAttack.comboAction;
+                                _attack = _attack.comboAction;
                                 return this;
                             }
                             else
                             {
-                                enemyManager.currentRecoveryTime = currentAttack.recoveryTime;
-                                currentAttack = null;
-                                return combatStanceState;
+                                _enemyManager.currentRecoveryTime = _attack.recoveryTime;
+                                _attack = null;
+                                return _combatState;
                             }                            
                         }
                     }
@@ -74,117 +72,117 @@ namespace SG
             }
             else
             {
-                GetNewAttack(enemyManager);
+                GetAttackNew(_enemyManager);
             }          
 
-            return combatStanceState;
+            return _combatState;
         }
 
-         private void GetNewAttack(EnemyManager enemyManager)
-        {
-            Vector3 tagretDirection = enemyManager.currentTarget.transform.position - transform.position;
-            float viewableAngle = Vector3.Angle(tagretDirection, transform.forward);
-            float distanceFromTarget = Vector3.Distance(enemyManager.currentTarget.transform.position, transform.position);
+         private void GetAttackNew(EnemyManager _enemyManager)
+         {
+            Vector3 _directionTagret = _enemyManager.currentTarget.transform.position - transform.position;
+            float _viewableAngle = Vector3.Angle(_directionTagret, transform.forward);
+            float _distanceToTarget = Vector3.Distance(_enemyManager.currentTarget.transform.position, transform.position);
 
-            int maxScore = 0;
+            int _scoreMaxValue = 0;
 
-            for (int i = 0; i < enemyAttacks.Length; i++)
+            for (int i = 0; i < _attackEnemy.Length; i++)
             {
-                EnemyAttackAction enemyAttackAction = enemyAttacks[i];
+                EnemyAttackAction _enemyAttackAction = _attackEnemy[i];
 
-                if (distanceFromTarget <= enemyAttackAction.maximumDistanceNeededToAttack 
-                && distanceFromTarget >= enemyAttackAction.mininumDistanceNeededToAttack)
+                if (_distanceToTarget <= _enemyAttackAction.maximumDistanceNeededToAttack 
+                && _distanceToTarget >= _enemyAttackAction.mininumDistanceNeededToAttack)
                 {
-                    if (viewableAngle <= enemyAttackAction.maximumAttackAngle 
-                    && viewableAngle >= enemyAttackAction.minimumAttackAngle)
+                    if (_viewableAngle <= _enemyAttackAction.maximumAttackAngle 
+                    && _viewableAngle >= _enemyAttackAction.minimumAttackAngle)
                     {
-                        maxScore += enemyAttackAction.attackScore;
+                        _scoreMaxValue += _enemyAttackAction.attackScore;
                     }
                 }
             }
             
-            int randomValue = Random.Range(0, maxScore);
-            int temporaryScore = 0;
+            int _randomValueScore = Random.Range(0, _scoreMaxValue);
+            int _temporaryScore = 0;
 
-            for (int i = 0; i < enemyAttacks.Length; i++)
+            for (int i = 0; i < _attackEnemy.Length; i++)
             {
-                EnemyAttackAction enemyAttackAction = enemyAttacks[i];
+                EnemyAttackAction _enemyAttackAction = _attackEnemy[i];
 
-                if (distanceFromTarget <= enemyAttackAction.maximumDistanceNeededToAttack
-                && distanceFromTarget >= enemyAttackAction.mininumDistanceNeededToAttack)
+                if (_distanceToTarget <= _enemyAttackAction.maximumDistanceNeededToAttack
+                && _distanceToTarget >= _enemyAttackAction.mininumDistanceNeededToAttack)
                 {
-                    if (viewableAngle <= enemyAttackAction.maximumAttackAngle 
-                    && viewableAngle >= enemyAttackAction.minimumAttackAngle)
+                    if (_viewableAngle <= _enemyAttackAction.maximumAttackAngle 
+                    && _viewableAngle >= _enemyAttackAction.minimumAttackAngle)
                     {
-                       if (currentAttack != null)
+                       if (_attack != null)
                        return;
 
-                       temporaryScore += enemyAttackAction.attackScore;
+                       _temporaryScore += _enemyAttackAction.attackScore;
 
-                       if (temporaryScore > randomValue)
+                       if (_temporaryScore > _randomValueScore)
                        {
-                           currentAttack = enemyAttackAction;
+                           _attack = _enemyAttackAction;
                        }
                     }
                 }
             }
-        }
+         }
 
-        public void HandleRotateTowardsTarget(EnemyManager enemyManager)
+        public void RotateTowardsTargetByHandle(EnemyManager _enemyManager)
         {
-            if(enemyManager.isPreformingAction)
+            if(_enemyManager.isPreformingAction)
             {
-                Vector3 direction = enemyManager.currentTarget.transform.position - transform.position;
-                direction.y = 0;
-                direction.Normalize();
+                Vector3 _direction = _enemyManager.currentTarget.transform.position - transform.position;
+                _direction.y = 0;
+                _direction.Normalize();
 
-                if(direction == Vector3.zero)
+                if(_direction == Vector3.zero)
                 {
-                    direction = transform.forward;
+                    _direction = transform.forward;
                 }
 
-                Quaternion targetRotation = Quaternion.LookRotation(direction);
-                enemyManager.transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, enemyManager.rotationSpeed * Time.deltaTime);
+                Quaternion _rotationTarget = Quaternion.LookRotation(_direction);
+                _enemyManager.transform.rotation = Quaternion.Slerp(transform.rotation, _rotationTarget, _enemyManager.rotationSpeed * Time.deltaTime);
             }
             else
             {
-                Vector3 relativeDirection = transform.InverseTransformDirection(enemyManager.navMeshAgent.desiredVelocity);
-                Vector3 targetVelocity = enemyManager.enemyRigidbody.velocity;
+                Vector3 _directionRelative = transform.InverseTransformDirection(_enemyManager.navMeshAgent.desiredVelocity);
+                Vector3 _velocityTarget = _enemyManager.enemyRigidbody.velocity;
 
-                enemyManager.navMeshAgent.enabled = true;
-                enemyManager.navMeshAgent.SetDestination(enemyManager.currentTarget.transform.position);
-                float distanceFromTarget = Vector3.Distance(enemyManager.currentTarget.transform.position, enemyManager.transform.position);
+                _enemyManager.navMeshAgent.enabled = true;
+                _enemyManager.navMeshAgent.SetDestination(_enemyManager.currentTarget.transform.position);
+                float _distanceToTarget = Vector3.Distance(_enemyManager.currentTarget.transform.position, _enemyManager.transform.position);
 
-            float rotationToApplyToDynamicEnemy = Quaternion.Angle(enemyManager.transform.rotation, Quaternion.LookRotation(enemyManager.navMeshAgent.desiredVelocity.normalized));
-            if (distanceFromTarget > 5) enemyManager.navMeshAgent.angularSpeed = 500f;
-            else if (distanceFromTarget < 5 && Mathf.Abs(rotationToApplyToDynamicEnemy) < 30) enemyManager.navMeshAgent.angularSpeed = 50f;
-            else if (distanceFromTarget < 5 && Mathf.Abs(rotationToApplyToDynamicEnemy) > 30) enemyManager.navMeshAgent.angularSpeed = 500f;
+            float _rotationApplyDynamicEnemy = Quaternion.Angle(_enemyManager.transform.rotation, Quaternion.LookRotation(_enemyManager.navMeshAgent.desiredVelocity.normalized));
+            if (_distanceToTarget > 5) _enemyManager.navMeshAgent.angularSpeed = 500f;
+            else if (_distanceToTarget < 5 && Mathf.Abs(_rotationApplyDynamicEnemy) < 30) _enemyManager.navMeshAgent.angularSpeed = 50f;
+            else if (_distanceToTarget < 5 && Mathf.Abs(_rotationApplyDynamicEnemy) > 30) _enemyManager.navMeshAgent.angularSpeed = 500f;
 
-            Vector3 targetDirection = enemyManager.currentTarget.transform.position - enemyManager.transform.position;
-            Quaternion rotationToApplyToStaticEnemy = Quaternion.LookRotation(targetDirection);
+            Vector3 _directionTarget = _enemyManager.currentTarget.transform.position - _enemyManager.transform.position;
+            Quaternion _rotationApplyStaticEnemy = Quaternion.LookRotation(_directionTarget);
 
 
-            if (enemyManager.navMeshAgent.desiredVelocity.magnitude > 0)
+            if (_enemyManager.navMeshAgent.desiredVelocity.magnitude > 0)
             {
-                enemyManager.navMeshAgent.updateRotation = false;
-                enemyManager.transform.rotation = Quaternion.RotateTowards(enemyManager.transform.rotation,
-                Quaternion.LookRotation(enemyManager.navMeshAgent.desiredVelocity.normalized), enemyManager.navMeshAgent.angularSpeed * Time.deltaTime);
+                _enemyManager.navMeshAgent.updateRotation = false;
+                _enemyManager.transform.rotation = Quaternion.RotateTowards(_enemyManager.transform.rotation,
+                Quaternion.LookRotation(_enemyManager.navMeshAgent.desiredVelocity.normalized), _enemyManager.navMeshAgent.angularSpeed * Time.deltaTime);
             }
             else
             {
-                enemyManager.transform.rotation = Quaternion.RotateTowards(enemyManager.transform.rotation, rotationToApplyToStaticEnemy, enemyManager.navMeshAgent.angularSpeed * Time.deltaTime);
+                _enemyManager.transform.rotation = Quaternion.RotateTowards(_enemyManager.transform.rotation, _rotationApplyStaticEnemy, _enemyManager.navMeshAgent.angularSpeed * Time.deltaTime);
             }
     
             }
         }
 
-        private void RollForComboChance(EnemyManager enemyManager)
+        private void ComboChanceByRoll(EnemyManager _enemyManager)
         {
-            float comboChance = Random.Range(0, 100);
+            float _chanceOfComno = Random.Range(0, 100);
 
-            if (enemyManager.allowAIPerfomConbos && comboChance <= enemyManager.comboLikelyHood)
+            if (_enemyManager.allowAIPerfomConbos && _chanceOfComno <= _enemyManager.comboLikelyHood)
             {
-                willDoComboOnNextAttack = true;
+                _itIsWillDoComboOnNextAttack = true;
             }
         }
     }

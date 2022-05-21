@@ -1,48 +1,44 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace SG
+namespace DangeonInf
 {
     public class IdleState : State
     {
-        public PursueTargetState pursueTargetState;
-        public LayerMask detectionLayer;
+        public PursueTargetState _pursueState;
+        public LayerMask _layerDetection;
 
-        public override State Tick(EnemyManager enemyManager, EnemyStatsManager enemyStatsManager, EnemyAnimatorManager enemyAnimatorManager)
+        public override State Tick(EnemyManager _enemyManager, EnemyStatsManager _enemyStatsManager, EnemyAnimatorManager _enemyAnimatorManager)
         {
             #region Handle Enemy Target Detection
-            Collider[] colliders = Physics.OverlapSphere(transform.position, enemyManager.detectionRadius, detectionLayer);
+            Collider[] _colliders = Physics.OverlapSphere(transform.position, _enemyManager.detectionRadius, _layerDetection);
 
-            for (int i = 0; i < colliders.Length; i++)
+            for (int i = 0; i < _colliders.Length; i++)
             {
-                CharacterStatsManager characterStats = colliders[i].transform.GetComponent<CharacterStatsManager>();
+                CharacterStatsManager _characterStats = _colliders[i].transform.GetComponent<CharacterStatsManager>();
 
-                if(characterStats != null)
+                if(_characterStats != null)
                 {
-                    Vector3 targetDirection = characterStats.transform.position - transform.position;
-                    float viewableAngle = Vector3.Angle(targetDirection, transform.forward);
+                    Vector3 _directionTarget = _characterStats.transform.position - transform.position;
+                    float _viewableAngle = Vector3.Angle(_directionTarget, transform.forward);
 
-                    if (viewableAngle > enemyManager.mininumDetectionAngle && viewableAngle < enemyManager.maximumDetectionAngle)
+                    if (_viewableAngle > _enemyManager.mininumDetectionAngle && _viewableAngle < _enemyManager.maximumDetectionAngle)
                     {
-                        enemyManager.currentTarget = characterStats;
+                        _enemyManager.currentTarget = _characterStats;
                     }                
                 }
             }
             #endregion
 
             #region Handle Switching To Next State
-            if(enemyManager.currentTarget !=null)
+            if(_enemyManager.currentTarget !=null)
             {
-                return pursueTargetState;//новое
-
+                return _pursueState;
             }
             else
             {
                 return this;
             }
-            #endregion
-            
+            #endregion            
         }
     }
 }

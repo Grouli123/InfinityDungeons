@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SG
+namespace DangeonInf
 {
     public class DisplayHighScore : MonoBehaviour
     {
